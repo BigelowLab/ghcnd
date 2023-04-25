@@ -1,0 +1,17 @@
+Package: ghcnd
+Type: Package
+Title: Global Historical Climatology Network daily (GHCNd)
+Version: 0.1.0
+Author: Ben Tupper
+Maintainer: Ben Tupper <btupper@bigelow.org>
+URL: https://github.com/BigelowLab/ghcnd
+Description: Querying and accessing NOAA's Global Historical Climatology Network daily (GHCNd).
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports:
+  rlang,
+  readr,
+  sf,
+  dplyr
+RoxygenNote: 7.2.3

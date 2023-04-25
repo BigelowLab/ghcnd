@@ -1,0 +1,70 @@
+---
+title: "GHCNd"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Requirement
+
++ [R v4.1+](https://www.r-project.org/)
+
++ [rlang](https://CRAN.R-project.org/package=rlang)
+
++ [readr](https://CRAN.R-project.org/package=readr)
+
++ [sf](https://CRAN.R-project.org/package=sf)
+
++ [dplyr](https://CRAN.R-project.org/package=dplyr)
+
+### Installation
+
+From within R using [remotes](https://CRAN.R-project.org/package=remotes)
+
+```
+remotes::install_github("BigelowLab/ghncd")
+```
+
+### Usage
+
+#### List the available stations
+
+```{r}
+suppressPackageStartupMessages({
+  library(ghcnd)
+  library(sf)
+  library(ggplot2)
+  library(dplyr)
+})
+
+stations = fetch_station_list() |>
+  glimpse()
+```
+
+```{r}
+plot(stations['elev'], pch = "+", main = 'Elevation in meters')
+```
+
+#### Get Data from one or more stations
+
+```{r}
+x = fetch_station(c('USW00014764', "USW00094623", 
+                                 "USC00172426", "USC00170100"),
+                          bind = TRUE) |>
+  glimpse()
+```
+```{r}
+x = mutate(x,TMIN = TMIN/10,TMAX = TMAX/10) |>
+         group_by(NAME)
+ggplot(data = x,  aes(x=DATE, y=TMAX)) +
+  geom_line() + 
+  facet_wrap(~NAME, scales = 'free_y')
+```
+
+
+
+
+
+
