@@ -7,7 +7,8 @@
 fetch_station(
   id = c("USW00014764", "USW00094623", "USC00172426", "USC00170100"),
   form = c("sf", "raw")[1],
-  bind = FALSE,
+  bind = TRUE,
+  transform = TRUE,
   drop_attributes = TRUE,
   baseuri = ghcnd_uri("access")
 )
@@ -19,6 +20,8 @@ fetch_station(
 
 \item{bind}{logical, if TRUE try to bind the sf/text objects by row.  Be advised, this might
 not always work.}
+
+\item{transform}{logical, if TRUE then transform values to real units}
 
 \item{drop_attributes}{logical, if TRUE drop variables that end with the name "_ATTRIBUTES"}
 

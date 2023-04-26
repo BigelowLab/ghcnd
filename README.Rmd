@@ -51,19 +51,28 @@ plot(stations['elev'], pch = "+", main = 'Elevation in meters')
 
 ```{r}
 x = fetch_station(c('USW00014764', "USW00094623", 
-                                 "USC00172426", "USC00170100"),
-                          bind = TRUE) |>
+                     "USC00172426", "USC00170100")) |>
   glimpse()
 ```
 ```{r}
-x = mutate(x,TMIN = TMIN/10,TMAX = TMAX/10) |>
-         group_by(NAME)
+x = x |> 
+  group_by(NAME)
 ggplot(data = x,  aes(x=DATE, y=TMAX)) +
   geom_line() + 
   facet_wrap(~NAME, scales = 'free_y')
 ```
 
+The same data aggregated into monthly means.  Below, we show just January TMAX.
 
+```{r}
+m = aggregate_monthly(x) |>
+  mutate(MONTH = format(DATE, "%b")) |>
+  group_by(NAME) 
+ggplot(data = filter(m, MONTH == "Jan"),  aes(x=DATE, y=TMAX)) +
+  geom_line() + 
+  geom_smooth() + 
+  facet_wrap(~NAME, scales = 'free_y')
+```
 
 
 

@@ -58,6 +58,7 @@ fetch_station_list = function(bbox = NULL, baseuri = ghcnd_uri("doc")){
 #' @param form char, one of 'sf' or 'raw' for raw text
 #' @param bind logical, if TRUE try to bind the sf/text objects by row.  Be advised, this might
 #'   not always work.
+#' @param transform logical, if TRUE then transform values to real units
 #' @param drop_attributes logical, if TRUE drop variables that end with the name "_ATTRIBUTES"
 #' @param baseuri char, the base uri
 #' @return list of sf objects or text vectors, one per station OR if \code{bind = TRUE}
@@ -65,7 +66,8 @@ fetch_station_list = function(bbox = NULL, baseuri = ghcnd_uri("doc")){
 fetch_station <- function(id = c('USW00014764', "USW00094623", 
                                  "USC00172426", "USC00170100"),
                           form = c("sf", "raw")[1],
-                          bind = FALSE, 
+                          bind = TRUE, 
+                          transform = TRUE,
                           drop_attributes = TRUE,
                           baseuri = ghcnd_uri("access")){
   if (tolower(form[1]) == "raw"){
@@ -82,6 +84,7 @@ fetch_station <- function(id = c('USW00014764', "USW00094623",
         x = suppressWarnings(readr::read_csv(uri, show_col_types = FALSE)) |>
           sf::st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = 4326)
         if (drop_attributes) x <- dplyr::select(x, -dplyr::ends_with("_ATTRIBUTES"))
+        if (transform) x <- element_transform(x)
         x
       })
     if (bind) xx = dplyr::bind_rows(xx)
