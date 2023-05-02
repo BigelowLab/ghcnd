@@ -14,7 +14,7 @@ fetch_station(
 )
 }
 \arguments{
-\item{id}{char, the station identifier(s)}
+\item{id}{char, the station identifier(s) or a ghcnd_station_list class}
 
 \item{form}{char, one of 'sf' or 'raw' for raw text}
 

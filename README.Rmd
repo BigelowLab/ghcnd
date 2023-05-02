@@ -33,6 +33,9 @@ remotes::install_github("BigelowLab/ghncd")
 
 ```{r}
 suppressPackageStartupMessages({
+  library(rnaturalearth)
+  library(rnaturalearthdata)
+  library(charlier)
   library(ghcnd)
   library(sf)
   library(ggplot2)
@@ -50,8 +53,12 @@ plot(stations['elev'], pch = "+", main = 'Elevation in meters')
 #### Get Data from one or more stations
 
 ```{r}
-x = fetch_station(c('USW00014764', "USW00094623", 
-                     "USC00172426", "USC00170100")) |>
+# stations can come and go, so check that yours are in the current list
+my_stations = stations |>
+  dplyr::filter(id %in% 
+                c('USW00014764', "USW00094623", "USC00172426", "USC00190736"))
+
+x = fetch_station(my_stations) |>
   glimpse()
 ```
 ```{r}
@@ -62,7 +69,7 @@ ggplot(data = x,  aes(x=DATE, y=TMAX)) +
   facet_wrap(~NAME, scales = 'free_y')
 ```
 
-The same data aggregated into monthly means.  Below, we show just January TMAX.
+The same data aggregated into monthly means.  Below, we show January and July TMAX.
 
 ```{r}
 m = aggregate_monthly(x) |>
@@ -74,6 +81,31 @@ ggplot(data = filter(m, MONTH == "Jan"),  aes(x=DATE, y=TMAX)) +
   facet_wrap(~NAME, scales = 'free_y')
 ```
 
+```{r}
+ggplot(data = filter(m, MONTH == "Jul"),  aes(x=DATE, y=TMAX)) +
+  geom_line() + 
+  geom_smooth() + 
+  facet_wrap(~NAME, scales = 'free_y')
+```
+
+And it is always interesting to see how the TMX-TMIN difference changes overtime...
+
+```{r}
+m = mutate(m, TDIFF = TMAX-TMIN)
+
+ggplot(data = filter(m, MONTH == "Jul"),  aes(x=DATE, y=TDIFF)) +
+  geom_line() + 
+  geom_smooth() + 
+  facet_wrap(~NAME, scales = 'free_y')
+```
 
 
 
+### Inventory
+
+GHCN provides an inventory of per station data.   We provide the stations table which allows us to transfer the station names to the inventory.
+
+```{r}
+inv = fetch_inventory(stations = stations) |>
+  glimpse()
+```

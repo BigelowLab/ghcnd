@@ -3,6 +3,7 @@
 export(aggregate_monthly)
 export(element_lut)
 export(element_transform)
+export(fetch_inventory)
 export(fetch_station)
 export(fetch_station_list)
 export(ghcnd_uri)

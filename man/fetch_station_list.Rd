@@ -12,7 +12,7 @@ fetch_station_list(bbox = NULL, baseuri = ghcnd_uri("doc"))
 \item{baseuri}{char, the baseuri}
 }
 \value{
-tibble or sf
+tibble or sf of ghcnd_station_list class
 }
 \description{
 ------------------------------
