@@ -14,5 +14,6 @@ Imports:
   rlang,
   readr,
   sf,
+  ggplot2,
   dplyr
 RoxygenNote: 7.2.3

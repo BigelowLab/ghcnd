@@ -67,13 +67,15 @@ fetch_station_list = function(bbox = NULL, baseuri = ghcnd_uri("doc")){
 #' a list?  Because stations may have differing fields.
 #' 
 #' @export
-#' @param id char, the station identifier(s) or a ghcnd_station_list class
+#' @param id char, the station identifier(s) or a ghcnd_station_list or ghncd_inventory class
 #' @param form char, one of 'sf' or 'raw' for raw text
 #' @param bind logical, if TRUE try to bind the sf/text objects by row.  Be advised, this might
 #'   not always work.
 #' @param transform logical, if TRUE then transform values to real units
 #' @param drop_attributes logical, if TRUE drop variables that end with the name "_ATTRIBUTES"
 #' @param baseuri char, the base uri
+#' @param vars char, if character, the names of variables to keep. If "all"
+#'   then keep all.
 #' @return list of sf objects or text vectors, one per station OR if \code{bind = TRUE}
 #'   then a single sf object or text vector
 fetch_station <- function(id = c('USW00014764', "USW00094623", 
@@ -82,9 +84,11 @@ fetch_station <- function(id = c('USW00014764', "USW00094623",
                           bind = TRUE, 
                           transform = TRUE,
                           drop_attributes = TRUE,
-                          baseuri = ghcnd_uri("access")){
-  if (inherits(id, "ghcnd_station_list")){
-    id = id$id
+                          baseuri = ghcnd_uri("access"),
+                          vars = c("STATION", "DATE", "ELEVATION", "NAME", "PRCP", 
+                                   "SNOW", "SNWD", "TMAX", "TMIN")){
+  if (inherits(id, "ghcnd_station_list") || inherits(id, "ghcnd_inventory") ){
+    id = unique(id$id)
   }
   if (tolower(form[1]) == "raw"){
     xx = lapply(id, 
@@ -99,6 +103,9 @@ fetch_station <- function(id = c('USW00014764', "USW00094623",
           message("unable to connect to ", uri)
           return(NULL)
         }
+        if (!("any" %in% tolower(vars))){
+          x = dplyr::select(x, dplyr::any_of(vars))
+        }  
         x
       })
     if (bind) xx <- unlist(xx)
@@ -120,6 +127,11 @@ fetch_station <- function(id = c('USW00014764', "USW00094623",
         
         if (drop_attributes) x <- dplyr::select(x, -dplyr::ends_with("_ATTRIBUTES"))
         if (transform) x <- element_transform(x)
+        
+        if (!("any" %in% tolower(vars))){
+          x = dplyr::select(x, dplyr::any_of(vars))
+        }  
+        
         x
       })
     if (bind) xx = dplyr::bind_rows(xx)
@@ -145,7 +157,8 @@ fetch_station <- function(id = c('USW00014764', "USW00094623",
 #' @export
 #' @param uri char the uri of the inventory
 #' @param stations, null or the output of \code{fetch_station_list}.  If provided,
-#'   then station name is added to the output.  Otherwise, only id is available.
+#'   then station name is added to the output and the output is filter to include only 
+#'   matches in id.  Otherwise, only id is available.
 #' @param add_duration logical, if TRUE add \code{duration} as a variable
 #' @return tibble
 fetch_inventory = function(
@@ -172,9 +185,12 @@ fetch_inventory = function(
   }
   
   if (!is.null(stations)){
-    x = dplyr::left_join(x, dplyr::select(stations, dplyr::all_of(c("id", "name"))) |> 
-                              sf::st_drop_geometry(), 
-                        by = "id")
+    x = x |>
+      dplyr::filter(.data$id %in% stations$id) |>
+      dplyr::left_join(dplyr::select(stations, dplyr::all_of(c("id", "name"))) |> 
+                         sf::st_drop_geometry(), 
+                      by = "id")
   }
+  class(x) <- c("ghcnd_inventory", class(x))
   x  
 }

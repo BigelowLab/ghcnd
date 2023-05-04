@@ -16,7 +16,8 @@ fetch_inventory(
 \item{add_duration}{logical, if TRUE add \code{duration} as a variable}
 
 \item{stations, }{null or the output of \code{fetch_station_list}.  If provided,
-then station name is added to the output.  Otherwise, only id is available.}
+then station name is added to the output and the output is filter to include only 
+matches in id.  Otherwise, only id is available.}
 }
 \value{
 tibble

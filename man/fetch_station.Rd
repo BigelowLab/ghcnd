@@ -10,11 +10,13 @@ fetch_station(
   bind = TRUE,
   transform = TRUE,
   drop_attributes = TRUE,
-  baseuri = ghcnd_uri("access")
+  baseuri = ghcnd_uri("access"),
+  vars = c("STATION", "DATE", "ELEVATION", "NAME", "PRCP", "SNOW", "SNWD", "TMAX",
+    "TMIN")
 )
 }
 \arguments{
-\item{id}{char, the station identifier(s) or a ghcnd_station_list class}
+\item{id}{char, the station identifier(s) or a ghcnd_station_list or ghncd_inventory class}
 
 \item{form}{char, one of 'sf' or 'raw' for raw text}
 
@@ -26,6 +28,9 @@ not always work.}
 \item{drop_attributes}{logical, if TRUE drop variables that end with the name "_ATTRIBUTES"}
 
 \item{baseuri}{char, the base uri}
+
+\item{vars}{char, if character, the names of variables to keep. If "all"
+then keep all.}
 }
 \value{
 list of sf objects or text vectors, one per station OR if \code{bind = TRUE}
